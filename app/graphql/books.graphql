@@ -1,0 +1,8 @@
+query books {
+    books {
+        __typename
+        id
+        title
+        author
+    }
+}
