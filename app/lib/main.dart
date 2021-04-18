@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
-import 'package:graphql_repro/graphql_api.dart';
+// import 'package:graphql_repro/graphql_api.dart';
 import 'package:normalize/normalize.dart';
 
-final booksListQuery = '''
-query {
-  books {
-    id
-    title
-    author
-  }
-}
-''';
+import 'graphql_api.graphql.dart';
 
 final graphqlClient = GraphQLClient(
   link: HttpLink('http://localhost:4000'),
@@ -42,16 +34,16 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+  HomeScreen({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var books = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>>? books = <Map<String, dynamic>>[];
 
   @override
   void initState() {
@@ -61,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .watchQuery(
           WatchQueryOptions(
             document: BooksQuery().document,
-            // document: gql(booksListQuery),
             fetchResults: true,
           ),
         )
@@ -70,11 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (result.data != null) {
         print(result.data);
         setState(() {
-          final bookz = BooksQuery().parse(result.data);
+          final bookz = BooksQuery().parse(result.data!);
           bookz.books.forEach((b) {
             print('${b.title} ${b.author}');
           });
-          books = result.data['books'].cast<Map<String, dynamic>>();
+          books = result.data!['books'].cast<Map<String, dynamic>>();
         });
       }
     });
@@ -87,9 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Books'),
       ),
       body: ListView.builder(
-        itemCount: books.length,
+        itemCount: books!.length,
         itemBuilder: (context, index) {
-          final book = books[index];
+          final book = books![index];
 
           return ListTile(
             title: Text(
@@ -115,26 +106,16 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class BookDetail extends StatefulWidget {
-  final String bookId;
+  final String? bookId;
 
   const BookDetail({
-    Key key,
+    Key? key,
     this.bookId,
   }) : super(key: key);
 
   @override
   _BookDetailState createState() => _BookDetailState();
 }
-
-final bookDetailQuery = r'''
-query book($id: String!) {
-  book(id: $id) {
-    title
-    author
-    id
-  }
-}
-''';
 
 final bookTitleMutation = r'''
 mutation updateBookTitle($id: String!, $title: String!) {
@@ -147,7 +128,7 @@ mutation updateBookTitle($id: String!, $title: String!) {
 ''';
 
 class _BookDetailState extends State<BookDetail> {
-  Map<String, dynamic> book;
+  Map<String, dynamic>? book;
   TextEditingController controller = TextEditingController();
 
   @override
@@ -158,20 +139,17 @@ class _BookDetailState extends State<BookDetail> {
   }
 
   Future<void> fetchBook() async {
+    var query = GetBookQuery(variables: GetBookArguments(id: '2'));
     final result = await graphqlClient.query(
       QueryOptions(
         fetchPolicy: FetchPolicy.networkOnly,
-        document: gql(
-          bookDetailQuery,
-        ),
-        variables: {
-          'id': widget.bookId,
-        },
+        document: query.document,
+        variables: query.variables.toJson(),
       ),
     );
 
     setState(() {
-      book = result.data['book'];
+      book = result.data!['book'];
     });
   }
 
@@ -186,8 +164,8 @@ class _BookDetailState extends State<BookDetail> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (book != null) ...[
-              Text('Title: ${book['title']}'),
-              Text('Author: ${book['author']}'),
+              Text('Title: ${book!['title']}'),
+              Text('Author: ${book!['author']}'),
               TextField(controller: controller),
               TextButton(
                 onPressed: () {

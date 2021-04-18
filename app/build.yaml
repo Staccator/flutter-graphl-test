@@ -3,11 +3,12 @@ targets:
     sources:
       - lib/**
       - graphql/**
-      - schema.json
+      - schema.graphql
     builders:
       artemis:
         options:
           schema_mapping:
-            - schema: schema.json
+            - schema: schema.graphql
               queries_glob: graphql/*.graphql
               output: lib/graphql_api.dart
+#              naming_scheme: simple
