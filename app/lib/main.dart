@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
-// import 'package:graphql_repro/graphql_api.dart';
+import 'package:graphql_repro/graphql_api.graphql.dart';
 import 'package:normalize/normalize.dart';
-
-import 'graphql_api.graphql.dart';
 
 final graphqlClient = GraphQLClient(
   link: HttpLink('http://localhost:4000'),
   cache: GraphQLCache(
     typePolicies: {
-      'Book': TypePolicy(
-        keyFields: {
-          'id': true,
-        },
-      ),
+      'Book': TypePolicy(),
     },
   ),
 );
@@ -43,7 +37,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>>? books = <Map<String, dynamic>>[];
+  // List<Map<String, dynamic>>? books = <Map<String, dynamic>>[];
+  List<GetBooks$Query$Book> books = [];
 
   @override
   void initState() {
@@ -52,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     graphqlClient
         .watchQuery(
           WatchQueryOptions(
-            document: BooksQuery().document,
+            document: GetBooksQuery().document,
             fetchResults: true,
           ),
         )
@@ -61,11 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (result.data != null) {
         print(result.data);
         setState(() {
-          final bookz = BooksQuery().parse(result.data!);
-          bookz.books.forEach((b) {
-            print('${b.title} ${b.author}');
-          });
-          books = result.data!['books'].cast<Map<String, dynamic>>();
+          books = GetBooksQuery().parse(result.data!).books;
         });
       }
     });
@@ -78,25 +69,16 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Books'),
       ),
       body: ListView.builder(
-        itemCount: books!.length,
+        itemCount: books.length,
         itemBuilder: (context, index) {
-          final book = books![index];
+          final book = books[index];
 
           return ListTile(
-            title: Text(
-              book['title'],
-            ),
-            subtitle: Text(
-              book['author'],
-            ),
+            title: Text(book.title),
+            subtitle: Text(book.author),
+            trailing: Text(book.id),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => BookDetail(
-                    bookId: book['id'],
-                  ),
-                ),
-              );
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookDetail(book.id)));
             },
           );
         },
@@ -106,30 +88,17 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class BookDetail extends StatefulWidget {
-  final String? bookId;
+  final String bookId;
 
-  const BookDetail({
-    Key? key,
-    this.bookId,
-  }) : super(key: key);
+  const BookDetail(this.bookId);
 
   @override
   _BookDetailState createState() => _BookDetailState();
 }
 
-final bookTitleMutation = r'''
-mutation updateBookTitle($id: String!, $title: String!) {
-  updateBookTitle(id: $id, title: $title) {
-    id
-    title
-    author
-  }
-}
-''';
-
 class _BookDetailState extends State<BookDetail> {
-  Map<String, dynamic>? book;
   TextEditingController controller = TextEditingController();
+  GetBook$Query$Book? book;
 
   @override
   void initState() {
@@ -139,17 +108,23 @@ class _BookDetailState extends State<BookDetail> {
   }
 
   Future<void> fetchBook() async {
-    var query = GetBookQuery(variables: GetBookArguments(id: '2'));
-    final result = await graphqlClient.query(
-      QueryOptions(
-        fetchPolicy: FetchPolicy.networkOnly,
-        document: query.document,
-        variables: query.variables.toJson(),
-      ),
-    );
-
-    setState(() {
-      book = result.data!['book'];
+    var query = GetBookQuery(variables: GetBookArguments(id: widget.bookId));
+    graphqlClient
+        .watchQuery(
+          WatchQueryOptions(
+            document: query.document,
+            variables: query.variables.toJson(),
+            fetchResults: true,
+          ),
+        )
+        .stream
+        .listen((result) {
+      if (result.data != null) {
+        print(result.data);
+        setState(() {
+          book = GetBookQuery(variables: query.variables).parse(result.data!).book;
+        });
+      }
     });
   }
 
@@ -164,20 +139,21 @@ class _BookDetailState extends State<BookDetail> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (book != null) ...[
-              Text('Title: ${book!['title']}'),
-              Text('Author: ${book!['author']}'),
+              Text('Title: ${book!.title}'),
+              Text('Author: ${book!.author}'),
               TextField(controller: controller),
               TextButton(
                 onPressed: () {
-                  graphqlClient.mutate(
-                    MutationOptions(
-                      document: gql(bookTitleMutation),
-                      variables: {
-                        'id': widget.bookId,
-                        'title': '${controller.value.text}',
-                      },
-                    ),
-                  );
+                  var arguments = UpdateBookTitleArguments(id: widget.bookId, title: '${controller.value.text}');
+                  print(arguments.toString());
+                  graphqlClient
+                      .mutate(
+                        MutationOptions(
+                          document: UpdateBookTitleMutation(variables: arguments).document,
+                          variables: arguments.toJson(),
+                        ),
+                      )
+                      .then((value) => print(value));
                 },
                 child: Text('Update Title'),
               )

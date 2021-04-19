@@ -1,4 +1,4 @@
-query books {
+query getBooks {
     books {
         __typename
         id
