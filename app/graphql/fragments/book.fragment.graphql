@@ -1,0 +1,6 @@
+fragment bookFragment on Book {
+    __typename
+    id
+    title
+    author
+}

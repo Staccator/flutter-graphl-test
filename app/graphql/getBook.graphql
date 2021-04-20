@@ -1,8 +1,5 @@
 query getBook($id: String!){
     book(id: $id){
-        __typename
-        author
-        id
-        title
+        ...bookFragment
     }
 }

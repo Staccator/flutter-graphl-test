@@ -7,8 +7,9 @@ targets:
     builders:
       artemis:
         options:
+          fragments_glob: graphql/fragments/**.fragment.graphql
           schema_mapping:
             - schema: schema.graphql
               queries_glob: graphql/*.graphql
               output: lib/graphql_api.dart
-#              naming_scheme: simple
+              naming_scheme: pathedWithNames

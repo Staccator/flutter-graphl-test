@@ -39,17 +39,17 @@ Map<String, dynamic> _$GetBooks$QueryToJson(GetBooks$Query instance) =>
 GetBook$Query$Book _$GetBook$Query$BookFromJson(Map<String, dynamic> json) {
   return GetBook$Query$Book()
     ..$$typename = json['__typename'] as String?
-    ..author = json['author'] as String
     ..id = json['id'] as String
-    ..title = json['title'] as String;
+    ..title = json['title'] as String
+    ..author = json['author'] as String;
 }
 
 Map<String, dynamic> _$GetBook$Query$BookToJson(GetBook$Query$Book instance) =>
     <String, dynamic>{
       '__typename': instance.$$typename,
-      'author': instance.author,
       'id': instance.id,
       'title': instance.title,
+      'author': instance.author,
     };
 
 GetBook$Query _$GetBook$QueryFromJson(Map<String, dynamic> json) {

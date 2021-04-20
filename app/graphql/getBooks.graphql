@@ -1,8 +1,5 @@
 query getBooks {
     books {
-        __typename
-        id
-        title
-        author
+        ...bookFragment
     }
 }

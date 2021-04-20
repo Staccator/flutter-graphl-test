@@ -7,21 +7,21 @@ import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 part 'graphql_api.graphql.g.dart';
 
+mixin BookFragmentMixin {
+  @JsonKey(name: '__typename')
+  String? $$typename;
+  late String id;
+  late String title;
+  late String author;
+}
+
 @JsonSerializable(explicitToJson: true)
-class GetBooks$Query$Book extends JsonSerializable with EquatableMixin {
+class GetBooks$Query$Book extends JsonSerializable
+    with EquatableMixin, BookFragmentMixin {
   GetBooks$Query$Book();
 
   factory GetBooks$Query$Book.fromJson(Map<String, dynamic> json) =>
       _$GetBooks$Query$BookFromJson(json);
-
-  @JsonKey(name: '__typename')
-  String? $$typename;
-
-  late String id;
-
-  late String title;
-
-  late String author;
 
   @override
   List<Object?> get props => [$$typename, id, title, author];
@@ -43,23 +43,15 @@ class GetBooks$Query extends JsonSerializable with EquatableMixin {
 }
 
 @JsonSerializable(explicitToJson: true)
-class GetBook$Query$Book extends JsonSerializable with EquatableMixin {
+class GetBook$Query$Book extends JsonSerializable
+    with EquatableMixin, BookFragmentMixin {
   GetBook$Query$Book();
 
   factory GetBook$Query$Book.fromJson(Map<String, dynamic> json) =>
       _$GetBook$Query$BookFromJson(json);
 
-  @JsonKey(name: '__typename')
-  String? $$typename;
-
-  late String author;
-
-  late String id;
-
-  late String title;
-
   @override
-  List<Object?> get props => [$$typename, author, id, title];
+  List<Object?> get props => [$$typename, id, title, author];
   Map<String, dynamic> toJson() => _$GetBook$Query$BookToJson(this);
 }
 
@@ -126,31 +118,40 @@ final GET_BOOKS_QUERY_DOCUMENT = DocumentNode(definitions: [
             arguments: [],
             directives: [],
             selectionSet: SelectionSetNode(selections: [
-              FieldNode(
-                  name: NameNode(value: '__typename'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'id'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'title'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'author'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null)
+              FragmentSpreadNode(
+                  name: NameNode(value: 'bookFragment'), directives: [])
             ]))
+      ])),
+  FragmentDefinitionNode(
+      name: NameNode(value: 'bookFragment'),
+      typeCondition: TypeConditionNode(
+          on: NamedTypeNode(name: NameNode(value: 'Book'), isNonNull: false)),
+      directives: [],
+      selectionSet: SelectionSetNode(selections: [
+        FieldNode(
+            name: NameNode(value: '__typename'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'id'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'title'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'author'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null)
       ]))
 ]);
 
@@ -210,31 +211,40 @@ final GET_BOOK_QUERY_DOCUMENT = DocumentNode(definitions: [
             ],
             directives: [],
             selectionSet: SelectionSetNode(selections: [
-              FieldNode(
-                  name: NameNode(value: '__typename'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'author'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'id'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null),
-              FieldNode(
-                  name: NameNode(value: 'title'),
-                  alias: null,
-                  arguments: [],
-                  directives: [],
-                  selectionSet: null)
+              FragmentSpreadNode(
+                  name: NameNode(value: 'bookFragment'), directives: [])
             ]))
+      ])),
+  FragmentDefinitionNode(
+      name: NameNode(value: 'bookFragment'),
+      typeCondition: TypeConditionNode(
+          on: NamedTypeNode(name: NameNode(value: 'Book'), isNonNull: false)),
+      directives: [],
+      selectionSet: SelectionSetNode(selections: [
+        FieldNode(
+            name: NameNode(value: '__typename'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'id'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'title'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null),
+        FieldNode(
+            name: NameNode(value: 'author'),
+            alias: null,
+            arguments: [],
+            directives: [],
+            selectionSet: null)
       ]))
 ]);
 

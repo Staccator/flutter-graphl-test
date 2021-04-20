@@ -17,7 +17,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,17 +27,12 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key, this.title}) : super(key: key);
-
-  final String? title;
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // List<Map<String, dynamic>>? books = <Map<String, dynamic>>[];
-  List<GetBooks$Query$Book> books = [];
+  List<BookFragmentMixin> books = [];
 
   @override
   void initState() {
@@ -70,19 +64,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView.builder(
         itemCount: books.length,
-        itemBuilder: (context, index) {
-          final book = books[index];
-
-          return ListTile(
-            title: Text(book.title),
-            subtitle: Text(book.author),
-            trailing: Text(book.id),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookDetail(book.id)));
-            },
-          );
-        },
+        itemBuilder: (context, index) => BookFragmentView(books[index]),
       ),
+    );
+  }
+}
+
+class BookFragmentView extends StatelessWidget {
+  final BookFragmentMixin book;
+  const BookFragmentView(this.book);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(book.title),
+      subtitle: Text(book.author),
+      trailing: Text(book.id),
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookDetail(book.id)));
+      },
     );
   }
 }
@@ -139,8 +139,7 @@ class _BookDetailState extends State<BookDetail> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (book != null) ...[
-              Text('Title: ${book!.title}'),
-              Text('Author: ${book!.author}'),
+              BookFragmentView(book!),
               TextField(controller: controller),
               TextButton(
                 onPressed: () {
