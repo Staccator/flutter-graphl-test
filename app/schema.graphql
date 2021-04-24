@@ -1,0 +1,542 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: RootQueryType
+    mutation: RootMutationType
+}
+
+union SectionEntry = Community | Offer | Space
+
+union SharedContent = Offer | Post | Space
+
+union TimelineItem = CommunityPost | Post | Section | Share
+
+"Schema representing a category."
+type Category {
+    "Id of the category."
+    id: ID!
+    "Name of the category."
+    name: String!
+    "Overlay of the category photo."
+    photoOverlayColor: Int!
+    "Url to the category photo."
+    photoUrl: String!
+}
+
+"Schema representing a community."
+type Community {
+    accentColor: Int
+    banned: Boolean!
+    "Category to which the community belongs to."
+    category: Category!
+    coverPhotoOverlayColor: Int
+    "Url to the community cover photo."
+    coverPhotoUrl: String
+    "Id of the community."
+    id: ID!
+    memberPostEnabled: Boolean
+    membersCount: Int!
+    name: String!
+    """
+
+    Kingschat id of the owner.
+
+    We don't use Yookos user for a legacy reason.
+    """
+    ownerId: String!
+    rank: String
+    shortBio: String
+    type: Int!
+    uniqueName: String!
+}
+
+"Schema representing a community post."
+type CommunityPost {
+    "String body of the post"
+    body: String!
+    "Community the post belongs to"
+    community: Community
+    "ID of post (news)"
+    id: ID!
+    "List of images embedded in the post"
+    images: [PostImage]
+    "Post owner"
+    owner: Space
+    "Publication date in milliseconds"
+    publishedAtMillis: Int!
+    "Describes if the post is removed"
+    removed: Boolean!
+    verb: String
+    """
+
+    Video embedded in the post.
+    There can be only one video in the post - also when video is present, there will be no images.
+    """
+    video: PostVideo
+    "String used to generate a web path for post"
+    webUrl: String!
+}
+
+"Schema representing an offer image."
+type Image {
+    "Url of the image."
+    url: String
+}
+
+"Schema representing an marketplace location."
+type Location {
+    "Location administrative area"
+    administrativeArea: String
+    "Location city"
+    city: String!
+    "Loction country"
+    country: String!
+    "Location latitude"
+    latitude: Float!
+    "Location locality"
+    locality: String
+    "Location longitude"
+    longitude: Float!
+    "Location postal code"
+    postalCode: String
+    "Location sub-administrative area"
+    subAdministrativeArea: String
+    "Location sub-locality"
+    subLocality: String
+    "Location sub-thoroughfare"
+    subThoroughfare: String
+    "Location thoroughfare"
+    thoroughfare: String
+}
+
+"Schema representing a category."
+type MarketplaceCategory {
+    filters: [MarketplaceCategoryFilter]
+    "Url to the category icon."
+    iconUrl: String
+    "Id of the category."
+    id: ID!
+    "Name of the category."
+    name: String!
+    "Parent category id"
+    parentCategoryId: ID
+}
+
+type MarketplaceCategoryFilter {
+    "Is filter inherited from parent category."
+    isInherited: Boolean!
+    "Name of the filter."
+    name: String!
+    possibleValues: [String]
+    "Url to the category icon."
+    required: Boolean!
+    "Type of the filter"
+    type: CategoryFilterType!
+    value: String
+}
+
+"Object representing image"
+type MentionedSpace {
+    id: ID!
+    spaceId: ID!
+    spaceName: String!
+}
+
+"Schema representing an offer."
+type Offer {
+    """
+
+    Date the offer was archived at.
+
+    For example 2005-04-02T21:37:00.
+    """
+    archivedAt: NaiveDateTime
+    "Category to which the product belongs to."
+    category: MarketplaceCategory!
+    "Condition of the product."
+    condition: ProductCondition!
+    "Email of the seller."
+    contactInfoEmail: String
+    "Kingschat id of the seller."
+    contactInfoKingschatId: String
+    "Phone number of the seller."
+    contactInfoPhoneNumber: String
+    "Dialing code of the seller phone number."
+    contactInfoPhoneNumberDialingCode: String
+    "Describes whether the buyer can contact the seller via kingschat."
+    contactViaKingschat: Boolean!
+    "Currency code of the offer price."
+    currencyCode: String
+    "Description of the offer."
+    description: String!
+    """
+
+    Expiration date of the offer.
+
+    For example 2005-04-02T21:37:00.
+    """
+    expiresAt: NaiveDateTime!
+    "Id of the offer."
+    id: ID!
+    "Images of the offer."
+    images: [Image]
+    "Describes whether the buyer can negotiate the price with the seller."
+    isPriceNegotiable: Boolean
+    "Location of the seller."
+    location: Location!
+    "Space that created the offer."
+    owner: Space!
+    "Price of the offer."
+    price: Int!
+    """
+
+    Date of the last refresh of the offer.
+
+    For example 2005-04-02T21:37:00.
+    """
+    refreshedAt: NaiveDateTime!
+    "The state of the offer."
+    state: OfferState!
+    "Title of the offer."
+    title: String!
+}
+
+type PageInfo {
+    "When paginating forwards, the cursor to continue."
+    endCursor: String
+    "When paginating forwards, are there more items?"
+    hasNextPage: Boolean!
+    "When paginating backwards, are there more items?"
+    hasPreviousPage: Boolean!
+    "When paginating backwards, the cursor to continue."
+    startCursor: String
+}
+
+"Schema representing a timeline post."
+type Post {
+    "String body of a post"
+    body: String!
+    "ID of post (news)"
+    id: ID!
+    "List of images embedded in the post"
+    images: [PostImage]
+    "List of spaces mentioned in a post"
+    mentionedSpaces: [MentionedSpace]
+    "Post owner (space who created the post)"
+    owner: Space!
+    "Publication date in milliseconds"
+    publishedAtMillis: Int
+    """
+
+    Video embedded in the post.
+    There can be only one video in the post - also when video is present, there will be no images.
+    """
+    video: PostVideo
+    "String used to generate a web path for post"
+    webPath: String
+}
+
+type PostConnection {
+    edges: [PostEdge]
+    pageInfo: PageInfo!
+}
+
+type PostEdge {
+    cursor: String
+    node: Post
+}
+
+"Object representing image"
+type PostImage {
+    "Image height"
+    height: Int
+    "Public url to an image"
+    url: String
+    "Image width"
+    width: Int
+}
+
+"Object representing video"
+type PostVideo {
+    "Video duration in seconds"
+    duration: Int
+    "Video mime type"
+    mimeType: String
+    "Video thumbnail to be displayed. Check Image description for more details"
+    thumbnail: Image
+    "Public url to the video"
+    url: String
+}
+
+type Report {
+    "Additional info about report. This is optional."
+    additionalInfo: String
+    "Reason of generating a report"
+    reason: Reason
+}
+
+type ReportedPost {
+    "Reported post"
+    post: Post
+    "List of individual reports that were generated for the post"
+    reports: [Report]
+    "Total number of reports generated for the post"
+    reportsCount: Int
+}
+
+type ReportedPostConnection {
+    edges: [ReportedPostEdge]
+    pageInfo: PageInfo!
+}
+
+type ReportedPostEdge {
+    cursor: String
+    node: ReportedPost
+}
+
+type ReportedSpace {
+    "List of individual reports that were generated for the space"
+    reports: [Report]
+    "Total number of reports generated for the space"
+    reportsCount: Int
+    "Reported space"
+    space: Space
+}
+
+type ReportedSpaceConnection {
+    edges: [ReportedSpaceEdge]
+    pageInfo: PageInfo!
+}
+
+type ReportedSpaceEdge {
+    cursor: String
+    node: ReportedSpace
+}
+
+type RootMutationType {
+    """
+
+    Bans space and removes all content it has ever made (posts, comments, offers and community posts)
+
+    Banned space cannot perform any mutations - it can only view app.
+    """
+    banSpace(input: BanSpaceInput!): Space
+    "Pins YookosTeam post"
+    pinYookosTeamPost(input: PinPostInput!): Post
+    """
+
+    Unpins currently pinned YookosTeam post if there is any.
+
+    If there was a pinned post, it will be returned.
+
+    If there was no pinned post at the moment, it will return null.
+    """
+    unpinYookosTeamPost: Post
+}
+
+type RootQueryType {
+    """
+
+    Returns currently pinned post by YookosTeam.
+    This should be handled by unified timeline response when it's ready.
+    """
+    getPinnedPost: Post
+    "Returns list of posts that were reported"
+    getReportedPosts(after: String, before: String, first: Int, last: Int): ReportedPostConnection
+    "Returns list of spaces that were reported"
+    getReportedSpaces(after: String, before: String, first: Int, last: Int): ReportedSpaceConnection
+    "Given count and offset, returns paginated timeline items."
+    getTimeline(
+        """
+
+        Number of timeline items you want to fetch.
+
+        Used for pagination.
+        """
+        count: Int!,
+        """
+
+        Current offset.
+
+        Used in pagination.
+        """
+        offset: Int!
+    ): [TimelineItem]
+    "Returns YookosTeam posts from newest to oldest"
+    getYookosTeamPosts(after: String, before: String, first: Int, last: Int): PostConnection
+}
+
+"Schema representing a section."
+type Section {
+    "Section entries."
+    entries: [SectionEntry]
+    """
+
+    Type of section.
+
+    For example: "Most popular spaces", "Recommended offers".
+
+    Available types of section differs depending on the entries the section has.
+    """
+    type: String
+}
+
+type Share {
+    "String body of a share"
+    body: String!
+    "ID of post (news)"
+    id: ID!
+    "List of images embedded in the post"
+    images: [PostImage]
+    "List of spaces mentioned in a share"
+    mentionedSpaces: [Space]
+    "The space that created the share"
+    owner: Space!
+    "Publication date in milliseconds"
+    publishedAtMillis: Int
+    """
+
+    Shared content.
+
+    It can be a post, a space, or an offer.
+    """
+    sharedContent: SharedContent
+    """
+
+    Video embedded in the post.
+
+    There can be only one video in the post - also when video is present, there will be no images.
+    """
+    video: PostVideo
+    "String used to generate a web path for share"
+    webPath: String
+}
+
+"Representation of space. Space is a main \"user\" in Yookos."
+type Space {
+    "Public url to space's avatar image"
+    avatarUrl: String
+    "Public url to space's background image"
+    backgroundImageUrl: String
+    "All badges belonging to the space."
+    badges: [Badge]
+    "Space descritpion"
+    description: String
+    "Unique name of space"
+    name: String!
+    "Total number of space's followers."
+    numberOfFollowers: Int
+    "Space privacy type"
+    privacyType: PrivacyType!
+    "Current space relationship with the space."
+    rank: Rank!
+    "Space identifier"
+    spaceId: String!
+}
+
+"Available badges for a space."
+enum Badge {
+    "The space is official."
+    OFFICIAL
+    "The space is verified."
+    VERIFIED
+}
+
+enum CategoryFilterType {
+    BOOLEAN
+    ENUM
+    INPUT
+}
+
+"Available offer states."
+enum OfferState {
+    "The offer is banned."
+    BANNED
+    "The offer is closed."
+    CLOSED
+    "The offer is deleted."
+    DELETED
+    "The offer is expired."
+    EXPIRED
+    "The offer is open."
+    OPEN
+}
+
+"Available privacy types for a space."
+enum PrivacyType {
+    "You need to send request to follow a space and see its posts."
+    PRIVATE
+    "Everyones can follow and see space's posts."
+    PUBLIC
+}
+
+"Available product conditions."
+enum ProductCondition {
+    "The product is broken."
+    BROKEN
+    "The product is new."
+    NEW
+    """
+
+    Product belongs to the category without product condition.
+
+    These categories are: "animal", "jobs", "services", "entertainment", "sport", "catering & events".
+    """
+    NONE
+    "The product is used."
+    USED
+}
+
+"Available relationship with the space."
+enum Rank {
+    "Current space is following the space."
+    MEMBER
+    "Current space doesn't follow the space."
+    NONE
+    "Current space is owner of the space."
+    OWNER
+    "Current space has sent request to follow the space."
+    PENDING
+}
+
+enum Reason {
+    "Used when resource is believed to be an advertisement"
+    ADS
+    "Used when reporter believes the account isn't real"
+    FAKE_ACCOUNT
+    "Used when resource is found to contain hate or violence"
+    HATE_OR_VIOLENCE
+    "Used when resource is found to contain some inappropriate content like porn"
+    INAPPROPRIATE_CONTENT
+    "Used when none of the above is accurate"
+    OTHER
+    "Used when resource is found to be spam."
+    SPAM
+    "Used when resource violates someone's privace, e.g. contains someone's images without permission"
+    VIOLATIONS_OF_PRIVACE
+}
+
+input BanSpaceInput {
+    """
+
+    Date by when space will be banned in seconds.
+
+    For example 2005-04-02T21:37:00.
+    """
+    endDate: NaiveDateTime!
+    "ID of space that is to be banned"
+    spaceId: String!
+}
+
+input PinPostInput {
+    "ID of YookosTeam's post that is to be pinned"
+    postId: String!
+}
+
+
+"""
+The `Naive DateTime` scalar type represents a naive date and time without
+timezone. The DateTime appears in a JSON response as an ISO8601 formatted
+string.
+"""
+scalar NaiveDateTime

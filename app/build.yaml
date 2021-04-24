@@ -3,11 +3,19 @@ targets:
     sources:
       - lib/**
       - graphql/**
-      - schema.json
+      - schema.graphql
     builders:
       artemis:
         options:
           schema_mapping:
-            - schema: schema.json
+            - schema: schema.graphql
               queries_glob: graphql/*.graphql
-              output: lib/graphql_api.dart
+              output: lib/api.graphql.dart
+              naming_scheme: simple
+#              type_name_field: __type
+          scalar_mapping:
+            - custom_parser_import: 'package:graphql_repro/coercers.dart'
+              graphql_type: NaiveDateTime
+              dart_type: DateTime
+          fragments_glob: null
+          ignore_for_file: []

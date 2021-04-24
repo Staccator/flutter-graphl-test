@@ -1,25 +1,37 @@
 name: graphql_repro
 description: A new Flutter project.
-
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  intl: ^0.17.0
 
-  graphql: ^5.0.0-nullsafety.3
-  json_serializable: ^4.1.0
-  artemis: ^7.0.0-beta.3
+#  graphql: ^4.0.1
+#  json_serializable: ^4.1.0
+#  artemis: ^7.0.0-beta.3
 
 #  needed to create dart files
 #  build_runner: ^1.7.2
 #  json_serializable: ^3.2.3
 #  artemis: ^2.1.4
+#  graphql_flutter: ^3.0.0-beta.3
+#  gql: 0.12.0
+#  equatable
+#  gql: ^0.12.4
+#  artemis: ^6.18.4
+#  graphql_flutter: ^4.0.1
+#  build_runner: ^1.10.11
+#  json_serializable: ^3.5.1
+  artemis: ^7.0.0-beta.3
+  graphql_flutter: ^5.0.0-nullsafety.2
+  build_runner: ^1.10.11
+  json_serializable: ^4.0.3
 
 dev_dependencies:
   flutter_test:

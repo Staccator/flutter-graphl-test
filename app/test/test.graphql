@@ -1,0 +1,19 @@
+query getReport{
+    getTimeline(count: 20, offset: 20){
+        ... on CommunityPost{
+            body
+        }
+        ... on Section{
+            entries{
+                ... on Offer{
+                    condition
+                    archivedAt
+                    contactInfoKingschatId
+                }
+                ... on Community{
+                    accentColor
+                }
+            }
+        }
+    }
+}
