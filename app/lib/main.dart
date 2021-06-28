@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
 import 'package:graphql_repro/graphql_api.graphql.dart';
@@ -7,7 +9,9 @@ final graphqlClient = GraphQLClient(
   link: HttpLink('http://localhost:4000'),
   cache: GraphQLCache(
     typePolicies: {
+      // not needed, but might be useful for custom cache keys
       'Book': TypePolicy(),
+      'Author': TypePolicy(),
     },
   ),
 );
@@ -34,11 +38,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<BookFragmentMixin> books = [];
 
+  late StreamSubscription<QueryResult> watchQuery;
+
   @override
   void initState() {
     super.initState();
 
-    graphqlClient
+    watchQuery = graphqlClient
         .watchQuery(
           WatchQueryOptions(
             document: GetBooksQuery().document,
@@ -54,6 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    watchQuery.cancel();
+    super.dispose();
   }
 
   @override
@@ -78,7 +90,7 @@ class BookFragmentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(book.title),
-      subtitle: Text(book.author),
+      subtitle: Text('${book.author.name} ${book.author.language}'),
       trailing: Text(book.id),
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookDetail(book.id)));
@@ -99,17 +111,25 @@ class BookDetail extends StatefulWidget {
 class _BookDetailState extends State<BookDetail> {
   TextEditingController controller = TextEditingController();
   GetBook$Query$Book? book;
+  dynamic cache = 'Click for cache';
+
+  late StreamSubscription<QueryResult> watchQuery;
 
   @override
   void initState() {
-    super.initState();
-
     fetchBook();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    watchQuery.cancel();
+    super.dispose();
   }
 
   Future<void> fetchBook() async {
     var query = GetBookQuery(variables: GetBookArguments(id: widget.bookId));
-    graphqlClient
+    watchQuery = graphqlClient
         .watchQuery(
           WatchQueryOptions(
             document: query.document,
@@ -140,23 +160,47 @@ class _BookDetailState extends State<BookDetail> {
               BookFragmentView(book!),
               TextField(controller: controller),
               TextButton(
-                onPressed: () {
-                  var arguments = UpdateBookTitleArguments(id: widget.bookId, title: '${controller.value.text}');
-                  print(arguments.toString());
-                  graphqlClient
-                      .mutate(
-                        MutationOptions(
-                          document: UpdateBookTitleMutation(variables: arguments).document,
-                          variables: arguments.toJson(),
-                        ),
-                      )
-                      .then((value) => print(value));
-                },
-                child: Text('Update Title'),
-              )
+                onPressed: () => updateBookTitle(),
+                child: Text('Update Book Title'),
+              ),
+              TextButton(
+                onPressed: () => updateAuthorName(),
+                child: Text('Update Author Name'),
+              ),
+              TextButton(
+                onPressed: () => printCache(),
+                child: Text(cache.toString()),
+              ),
             ]
           ],
         ),
+      ),
+    );
+  }
+
+  void printCache() {
+    setState(() {
+      cache = graphqlClient.cache.store.toMap();
+    });
+    print(graphqlClient.cache.store.toMap());
+  }
+
+  void updateAuthorName() {
+    var arguments = UpdateAuthorNameArguments(id: book!.author.id, name: '${controller.value.text}');
+    graphqlClient.mutate(
+      MutationOptions(
+        document: UpdateAuthorNameMutation(variables: arguments).document,
+        variables: arguments.toJson(),
+      ),
+    );
+  }
+
+  void updateBookTitle() {
+    var arguments = UpdateBookTitleArguments(id: widget.bookId, title: '${controller.value.text}');
+    graphqlClient.mutate(
+      MutationOptions(
+        document: UpdateBookTitleMutation(variables: arguments).document,
+        variables: arguments.toJson(),
       ),
     );
   }

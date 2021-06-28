@@ -6,11 +6,17 @@ const { ApolloServer, gql } = require('apollo-server');
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
+  type Author {
+    id: String!
+    name: String!
+    language: String!
+  }
+
   # This "Book" type defines the queryable fields for every book in our data source.
   type Book {
     id: String!
     title: String!
-    author: String!
+    author: Author!
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -23,6 +29,7 @@ const typeDefs = gql`
 
   type Mutation {
     updateBookTitle(id: String!, title: String!): Book
+    updateAuthorName(id: String!, name: String!): Author
   }
 `;
 
@@ -30,12 +37,20 @@ const books = [
   {
     id: '1',
     title: 'The Awakening',
-    author: 'Kate Chopin',
+    author: {
+      id: 'a1',
+      name: 'Andrew',
+      language: 'pl'
+    },
   },
   {
     id: '2',
     title: 'City of Glass',
-    author: 'Paul Auster',    
+    author: {
+      id: 'a1',
+      name: 'Terry',
+      language: 'eng',
+    },   
   },
 ];
 
@@ -52,7 +67,14 @@ const resolvers = {
       book.title = args.title;
 
       return book;
-    }
+    },
+    updateAuthorName: (parent, args, context, info) => {
+      let book = books.filter((book) => book.author.id == args.id)[0];
+      let author = book.author;
+      author.name = args.name;
+
+      return author;
+    },
   }
 };
 
