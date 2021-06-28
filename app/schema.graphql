@@ -5,13 +5,20 @@ schema {
     mutation: Mutation
 }
 
+type Author {
+    id: String!
+    language: String!
+    name: String!
+}
+
 type Book {
-    author: String!
+    author: Author!
     id: String!
     title: String!
 }
 
 type Mutation {
+    updateAuthorName(id: String!, name: String!): Author
     updateBookTitle(id: String!, title: String!): Book
 }
 

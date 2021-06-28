@@ -1,0 +1,8 @@
+mutation updateAuthorName($id: String!, $name: String!) {
+    updateAuthorName(id: $id, name: $name) {
+        __typename
+        id
+        name
+        language
+    }
+}

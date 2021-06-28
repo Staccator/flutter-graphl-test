@@ -3,6 +3,8 @@ mutation updateBookTitle($id: String!, $title: String!) {
         __typename
         id
         title
-        author
+        author {
+            ...authorFragment
+        }
     }
 }
